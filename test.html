@@ -8,12 +8,34 @@
       font-family: sans-serif;
       text-align: center;
       margin: 20px;
+      background: #f5f5f5;
     }
     #result {
       font-size: 24px;
       margin: 20px 0;
       font-weight: bold;
     }
+    .buttons {
+      display: flex;
+      justify-content: center;
+      gap: 10px;
+      margin-bottom: 20px;
+    }
+    button {
+      padding: 0.8rem 1.5rem;
+      font-size: 1rem;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      color: white;
+    }
+    button:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+    }
+    .start { background: #007bff; }
+    .stop { background: #dc3545; }
+    .clear { background: #6c757d; }
     #history {
       margin-top: 40px;
       text-align: left;
@@ -37,9 +59,14 @@
   </style>
 </head>
 <body>
+
   <h1>東京メトロ駅ルーレット</h1>
-  <button id="start">スタート</button>
-  <button id="stop">ストップ</button>
+  <div class="buttons">
+    <button class="start" id="startBtn">Start</button>
+    <button class="stop" id="stopBtn" disabled>Stop</button>
+    <button class="clear" id="clearBtn">履歴クリア</button>
+  </div>
+
   <div id="result">駅がここに表示されます</div>
 
   <div id="history">
@@ -49,39 +76,51 @@
 
   <script>
     let stations = [];
-    let timer;
+    let intervalId = null;
     let currentStation = null;
 
-    // JSONを読み込み
+    // JSONを読み込む
     fetch("tokyo_metro_stations.json")
       .then(response => response.json())
       .then(data => {
         stations = data;
+        console.log("駅データ読み込み完了:", stations.length, "件");
       })
       .catch(err => console.error("JSON読み込みエラー:", err));
 
-    const resultDiv = document.getElementById("result");
+    const display = document.getElementById("result");
     const historyList = document.getElementById("historyList");
+    const startBtn = document.getElementById("startBtn");
+    const stopBtn = document.getElementById("stopBtn");
+    const clearBtn = document.getElementById("clearBtn");
 
-    document.getElementById("start").addEventListener("click", () => {
+    startBtn.addEventListener("click", () => {
       if (stations.length === 0) return;
-      clearInterval(timer);
-      timer = setInterval(() => {
-        const randomIndex = Math.floor(Math.random() * stations.length);
-        currentStation = stations[randomIndex];
-        resultDiv.textContent = `${currentStation.line} - ${currentStation.station}`;
+      startBtn.disabled = true;
+      stopBtn.disabled = false;
+      intervalId = setInterval(() => {
+        const random = stations[Math.floor(Math.random() * stations.length)];
+        currentStation = random;
+        display.textContent = `${random.line} - ${random.station}`;
       }, 100);
     });
 
-    document.getElementById("stop").addEventListener("click", () => {
-      clearInterval(timer);
+    stopBtn.addEventListener("click", () => {
+      clearInterval(intervalId);
+      startBtn.disabled = false;
+      stopBtn.disabled = true;
       if (currentStation) {
-        // 履歴に追加
         const li = document.createElement("li");
         li.textContent = `${currentStation.line} - ${currentStation.station}`;
         historyList.appendChild(li);
       }
     });
+
+    // 履歴クリア
+    clearBtn.addEventListener("click", () => {
+      historyList.innerHTML = "";
+    });
   </script>
+
 </body>
 </html>
