@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <title>東京メトロ駅ルーレット</title>
+  <style>
+    body {
+      font-family: sans-serif;
+      text-align: center;
+      margin: 20px;
+    }
+    #result {
+      font-size: 24px;
+      margin: 20px 0;
+      font-weight: bold;
+    }
+    #history {
+      margin-top: 40px;
+      text-align: left;
+      max-width: 400px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+    #history h2 {
+      font-size: 18px;
+      border-bottom: 1px solid #ccc;
+      padding-bottom: 5px;
+    }
+    #history ul {
+      list-style: none;
+      padding: 0;
+    }
+    #history li {
+      padding: 5px 0;
+      border-bottom: 1px dashed #ddd;
+    }
+  </style>
+</head>
+<body>
+  <h1>東京メトロ駅ルーレット</h1>
+  <button id="start">スタート</button>
+  <button id="stop">ストップ</button>
+  <div id="result">駅がここに表示されます</div>
+
+  <div id="history">
+    <h2>履歴</h2>
+    <ul id="historyList"></ul>
+  </div>
+
+  <script>
+    let stations = [];
+    let timer;
+    let currentStation = null;
+
+    // JSONを読み込み
+    fetch("tokyo_metro_stations.json")
+      .then(response => response.json())
+      .then(data => {
+        stations = data;
+      })
+      .catch(err => console.error("JSON読み込みエラー:", err));
+
+    const resultDiv = document.getElementById("result");
+    const historyList = document.getElementById("historyList");
+
+    document.getElementById("start").addEventListener("click", () => {
+      if (stations.length === 0) return;
+      clearInterval(timer);
+      timer = setInterval(() => {
+        const randomIndex = Math.floor(Math.random() * stations.length);
+        currentStation = stations[randomIndex];
+        resultDiv.textContent = `${currentStation.line} - ${currentStation.station}`;
+      }, 100);
+    });
+
+    document.getElementById("stop").addEventListener("click", () => {
+      clearInterval(timer);
+      if (currentStation) {
+        // 履歴に追加
+        const li = document.createElement("li");
+        li.textContent = `${currentStation.line} - ${currentStation.station}`;
+        historyList.appendChild(li);
+      }
+    });
+  </script>
+</body>
+</html>
