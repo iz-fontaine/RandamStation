@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <title>東京メトロ駅ルーレット</title>
+  <style>
+    body {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+      font-family: sans-serif;
+      background: #f5f5f5;
+    }
+    h1 {
+      font-size: 2rem;
+      margin-bottom: 2rem;
+    }
+    .buttons {
+      display: flex;
+      gap: 1rem;
+    }
+    button {
+      padding: 0.8rem 1.5rem;
+      font-size: 1rem;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+    }
+    .start { background: #007bff; color: white; }
+    .stop { background: #dc3545; color: white; }
+    button:disabled { opacity: 0.6; cursor: not-allowed; }
+  </style>
+</head>
+<body>
+
+  <h1 id="display">？</h1>
+  <div class="buttons">
+    <button class="start" id="startBtn">Start</button>
+    <button class="stop" id="stopBtn" disabled>Stop</button>
+  </div>
+
+  <script>
+    let stations = [];
+    let intervalId = null;
+
+    const display = document.getElementById("display");
+    const startBtn = document.getElementById("startBtn");
+    const stopBtn = document.getElementById("stopBtn");
+
+    // JSONファイルを読み込む
+    fetch("tokyo_metro_stations.json")
+      .then(response => response.json())
+      .then(data => {
+        stations = data;
+        console.log("駅データを読み込みました:", stations.length, "件");
+      })
+      .catch(err => {
+        console.error("駅データの読み込み失敗:", err);
+      });
+
+    startBtn.addEventListener("click", () => {
+      if (stations.length === 0) {
+        alert("駅データをまだ読み込めていません！");
+        return;
+      }
+      startBtn.disabled = true;
+      stopBtn.disabled = false;
+
+      intervalId = setInterval(() => {
+        const random = stations[Math.floor(Math.random() * stations.length)];
+        display.textContent = `${random.line} - ${random.station}`;
+      }, 100);
+    });
+
+    stopBtn.addEventListener("click", () => {
+      clearInterval(intervalId);
+      startBtn.disabled = false;
+      stopBtn.disabled = true;
+    });
+  </script>
+
+</body>
+</html>
