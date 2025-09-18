@@ -33,7 +33,7 @@
       flex: 1;
       max-width: 600px;
       margin: 0 auto;
-      padding: 0 15px 80px; /* 下部に余白（ボタン分） */
+      padding: 0 15px 10px; /* 下部に余白 */
       box-sizing: border-box;
     }
 
@@ -64,12 +64,47 @@
       margin: 0;
       max-height: 300px; /* 固定高さ */
       overflow-y: auto; /* スクロール可能 */
+      width: 100%; /* 横幅固定 */
+      box-sizing: border-box;
     }
 
     #history li {
       padding: 8px 0;
       border-bottom: 1px dashed #ddd;
       font-size: 0.95rem;
+      word-break: break-word;
+    }
+
+    /* プロンプトボタン＋コピー横並び */
+    .prompt-section {
+      max-width: 600px;
+      margin: 10px auto 0 auto;
+      display: flex;
+      gap: 10px;
+      justify-content: space-between;
+      flex-wrap: wrap;
+    }
+
+    .prompt-section button {
+      flex: 1;
+      padding: 0.8rem 0;
+      font-size: 1rem;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      color: white;
+    }
+
+    #generatePrompt { background: #28a745; }
+    #copyPrompt { background: #ffc107; color: #000; }
+
+    #promptText {
+      margin-top: 10px;
+      width: 100%;
+      height: 150px;
+      padding: 8px;
+      font-size: 14px;
+      box-sizing: border-box;
     }
 
     /* フッターボタン */
@@ -86,17 +121,6 @@
       z-index: 10;
     }
 
-    button {
-      flex: 1;
-      margin: 0 10px;
-      padding: 0.8rem 0;
-      font-size: 1rem;
-      border: none;
-      border-radius: 8px;
-      cursor: pointer;
-      color: white;
-    }
-
     button:disabled {
       opacity: 0.6;
       cursor: not-allowed;
@@ -104,48 +128,6 @@
 
     .start { background: #007bff; }
     .stop { background: #dc3545; }
-
-    /* プロンプト生成ボタン用 */
-    .prompt-section {
-      max-width: 600px;
-      margin: 20px auto;
-      padding: 0 15px;
-      box-sizing: border-box;
-      position: relative;
-      z-index: 10;
-    }
-
-    .prompt-section button {
-      background: #28a745;
-      color: white;
-      border-radius: 8px;
-      padding: 0.8rem 0;
-      width: 100%;
-      font-size: 1rem;
-      cursor: pointer;
-      border: none;
-    }
-
-    #promptText {
-      font-size: 14px;
-      width: 100%;
-      height: 150px;
-      padding: 8px;
-      margin-top: 10px;
-      box-sizing: border-box;
-    }
-
-    #copyPrompt {
-      margin-top: 5px;
-      background: #ffc107;
-      color: #000;
-      border-radius: 6px;
-      padding: 0.5rem 0;
-      width: 100%;
-      font-size: 1rem;
-      border: none;
-      cursor: pointer;
-    }
   </style>
 </head>
 <body>
@@ -155,20 +137,20 @@
 
 <div id="history">
   <div id="history-header">
-    <h2>履歴</h2>
+    <h2>履歴（最大5件）</h2>
     <span id="clearText">クリア</span>
   </div>
   <ul id="historyList"></ul>
 </div>
 
-<!-- プロンプト生成エリア -->
+<!-- プロンプト生成ボタンとコピーを履歴下に横並び -->
 <div class="prompt-section">
   <button id="generatePrompt">プロンプト生成</button>
-  <div id="promptOutput" style="display:none;">
-    <textarea id="promptText" readonly></textarea>
-    <button id="copyPrompt">コピーする</button>
-  </div>
+  <button id="copyPrompt">コピー</button>
 </div>
+
+<!-- プロンプトテキスト -->
+<textarea id="promptText" readonly style="display:none;"></textarea>
 
 <div class="buttons">
   <button class="start" id="startBtn">Start</button>
@@ -176,7 +158,7 @@
 </div>
 
 <script>
-  // グローバル履歴配列
+  // グローバル変数
   let history = [];
   let stations = [];
   let intervalId = null;
@@ -196,6 +178,9 @@
   const startBtn = document.getElementById("startBtn");
   const stopBtn = document.getElementById("stopBtn");
   const clearText = document.getElementById("clearText");
+  const generatePromptBtn = document.getElementById("generatePrompt");
+  const copyPromptBtn = document.getElementById("copyPrompt");
+  const promptText = document.getElementById("promptText");
 
   // Startボタン
   startBtn.addEventListener("click", () => {
@@ -220,8 +205,8 @@
       li.textContent = stationText;
       historyList.appendChild(li);
       history.push(stationText);
-      if(history.length > 5){ // 最大5件に制限
-        history.shift(); // 古い履歴を削除
+      if(history.length > 5){ // 最大5件
+        history.shift();
         historyList.removeChild(historyList.firstChild);
       }
     }
@@ -231,16 +216,12 @@
   clearText.addEventListener("click", () => {
     historyList.innerHTML = "";
     history = [];
+    promptText.style.display = "none";
   });
 
   // プロンプト生成
-  const generatePromptBtn = document.getElementById("generatePrompt");
-  const promptOutput = document.getElementById("promptOutput");
-  const promptText = document.getElementById("promptText");
-  const copyPromptBtn = document.getElementById("copyPrompt");
-
   generatePromptBtn.addEventListener("click", () => {
-    if (history.length === 0) {
+    if(history.length === 0){
       alert("履歴がありません");
       return;
     }
@@ -264,15 +245,16 @@
     const fullPrompt = `${intro}\n${stationList}`;
 
     promptText.value = fullPrompt;
-    promptOutput.style.display = "block";
+    promptText.style.display = "block";
   });
 
+  // コピー
   copyPromptBtn.addEventListener("click", () => {
+    if(promptText.value === "") return;
     promptText.select();
     document.execCommand("copy");
     alert("プロンプトをコピーしました！");
   });
-
 </script>
 
 </body>
