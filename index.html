@@ -58,15 +58,15 @@
       user-select: none;
     }
 
-    #history ul {
-      list-style: none;
-      padding: 0;
-      margin: 0;
-      max-height: 250px;
-      overflow-y: auto;
-      width: 100%;
-      box-sizing: border-box;
-    }
+#history ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  height: 200px; /* 固定高さ（5件分目安） */
+  overflow-y: auto; /* スクロール可能 */
+  width: 100%;
+  box-sizing: border-box;
+}
 
     #history li {
       padding: 8px 0;
@@ -103,20 +103,21 @@
     #copyPrompt { background: #ff9800; color: #000; }
 
     /* プロンプトテキスト */
-    #promptText {
-      margin: 10px auto;
-      width: 90%;
-      max-width: 600px;
-      height: 150px;
-      padding: 8px;
-      font-size: 14px;
-      box-sizing: border-box;
-      display: none;
-      border: 1px solid #ccc;
-      border-radius: 8px;
-      background: #fff;
-      resize: vertical;
-    }
+#promptText {
+  margin: 10px auto;
+  width: 90%;
+  max-width: 600px;
+  height: 150px;
+  padding: 8px;
+  font-size: 14px;
+  box-sizing: border-box;
+  display: block; /* 最初から表示 */
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  background: #fff;
+  resize: vertical;
+}
+
 
     /* 結果と履歴・ボタンの間にスペース確保 */
     #result, #history, .button-group, #promptText {
@@ -141,10 +142,12 @@
 <div class="button-group">
   <button class="start" id="startBtn">Start</button>
   <button class="stop" id="stopBtn" disabled>Stop</button>
-  <button id="generatePrompt">プロンプト生成</button>
-  <button id="copyPrompt">コピー</button>
 </div>
 
+<div id="prompt-header" style="max-width:600px; width:90%; margin:0 auto 5px; display:flex; justify-content:space-between; align-items:center;">
+  <span>プロンプト作成</span>
+  <span id="copyPromptText" style="color:#007bff; cursor:pointer; user-select:none;">コピー</span>
+</div>
 <textarea id="promptText" readonly></textarea>
 
 <script>
@@ -238,12 +241,15 @@
   });
 
   // コピー
-  copyPromptBtn.addEventListener("click", () => {
-    if(promptText.value === "") return;
-    promptText.select();
-    document.execCommand("copy");
-    alert("プロンプトをコピーしました！");
-  });
+const copyPromptText = document.getElementById("copyPromptText");
+
+copyPromptText.addEventListener("click", () => {
+  if(promptText.value === "") return;
+  promptText.select();
+  document.execCommand("copy");
+  alert("プロンプトをコピーしました！");
+});
+
 </script>
 
 </body>
