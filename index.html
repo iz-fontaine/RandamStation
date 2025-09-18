@@ -58,6 +58,14 @@
       user-select: none;
     }
 
+    #copyPromptText {
+      font-size: 0.9rem;
+      color: #007bff;
+      cursor: pointer;
+      user-select: none;
+    }
+    
+
 #history ul {
   list-style: none;
   padding: 0;
@@ -143,18 +151,20 @@
   <button class="start" id="startBtn">Start</button>
   <button class="stop" id="stopBtn" disabled>Stop</button>
 </div>
+  
+<!-- プロンプト作成ボタン -->
+<div class="button-group" style="margin-top:10px;">
+  <button id="generatePrompt">プロンプト作成</button>
+</div>
 
 <div id="history">
   <div id="history-header">
-    <h2>プロンプト作成</h2>
+    <h2>AI用プロンプト</h2>
     <span id="copyPromptText">コピー</span>
   </div>
   <textarea id="promptText" readonly></textarea>
   </div>
   
-<div class="button-group">
-  <button id="generatePrompt">プロンプト生成</button>
-</div>
   
 <script>
   let history = [];
