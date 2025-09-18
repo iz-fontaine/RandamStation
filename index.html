@@ -144,12 +144,16 @@
   <button class="stop" id="stopBtn" disabled>Stop</button>
 </div>
 
-<div id="prompt-header" style="max-width:600px; width:90%; margin:0 auto 5px; display:flex; justify-content:space-between; align-items:center;">
-  <span>プロンプト作成</span>
-  <span id="copyPromptText" style="color:#007bff; cursor:pointer; user-select:none;">コピー</span>
+<div id="history-header">
+  <h2>プロンプト作成</h2>
+  <span id="clearText">コピー</span>
 </div>
 <textarea id="promptText" readonly></textarea>
-
+  
+<div class="button-group">
+  <button id="generatePrompt">プロンプト生成</button>
+</div>
+  
 <script>
   let history = [];
   let stations = [];
