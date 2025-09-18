@@ -83,6 +83,7 @@
       display: flex;
       justify-content: space-around;
       padding: 10px 0;
+      z-index: 10;
     }
 
     button {
@@ -103,39 +104,136 @@
 
     .start { background: #007bff; }
     .stop { background: #dc3545; }
+
+    /* プロンプト生成ボタン用 */
     .prompt-section {
       max-width: 600px;
       margin: 20px auto;
       padding: 0 15px;
       box-sizing: border-box;
+      position: relative;
+      z-index: 10;
     }
 
+    .prompt-section button {
+      background: #28a745;
+      color: white;
+      border-radius: 8px;
+      padding: 0.8rem 0;
+      width: 100%;
+      font-size: 1rem;
+      cursor: pointer;
+      border: none;
+    }
+
+    #promptText {
+      font-size: 14px;
+      width: 100%;
+      height: 150px;
+      padding: 8px;
+      margin-top: 10px;
+      box-sizing: border-box;
+    }
+
+    #copyPrompt {
+      margin-top: 5px;
+      background: #ffc107;
+      color: #000;
+      border-radius: 6px;
+      padding: 0.5rem 0;
+      width: 100%;
+      font-size: 1rem;
+      border: none;
+      cursor: pointer;
+    }
   </style>
 </head>
 <body>
 
-  <h1>東京メトロ駅ルーレット</h1>
-  <div id="result">駅がここに表示されます</div>
+<h1>東京メトロ駅ルーレット</h1>
+<div id="result">駅がここに表示されます</div>
 
-  <div id="history">
-    <div id="history-header">
-      <h2>履歴</h2>
-      <span id="clearText">クリア</span>
-    </div>
-    <ul id="historyList"></ul>
+<div id="history">
+  <div id="history-header">
+    <h2>履歴</h2>
+    <span id="clearText">クリア</span>
   </div>
+  <ul id="historyList"></ul>
+</div>
 
-  <!-- プロンプト生成エリア -->
+<!-- プロンプト生成エリア -->
 <div class="prompt-section">
   <button id="generatePrompt">プロンプト生成</button>
-  <div id="promptOutput" style="display:none; margin-top:10px;">
-    <textarea id="promptText" readonly
-      style="width:100%; height:150px; padding:8px; font-size:14px;"></textarea>
-    <button id="copyPrompt" style="margin-top:5px;">コピーする</button>
+  <div id="promptOutput" style="display:none;">
+    <textarea id="promptText" readonly></textarea>
+    <button id="copyPrompt">コピーする</button>
   </div>
 </div>
 
+<div class="buttons">
+  <button class="start" id="startBtn">Start</button>
+  <button class="stop" id="stopBtn" disabled>Stop</button>
+</div>
+
 <script>
+  // グローバル履歴配列
+  let history = [];
+  let stations = [];
+  let intervalId = null;
+  let currentStation = null;
+
+  // JSON読み込み
+  fetch("tokyo_metro_stations.json")
+    .then(res => res.json())
+    .then(data => {
+      stations = data;
+      console.log("駅データ読み込み完了:", stations.length);
+    })
+    .catch(err => console.error("JSON読み込みエラー:", err));
+
+  const display = document.getElementById("result");
+  const historyList = document.getElementById("historyList");
+  const startBtn = document.getElementById("startBtn");
+  const stopBtn = document.getElementById("stopBtn");
+  const clearText = document.getElementById("clearText");
+
+  // Startボタン
+  startBtn.addEventListener("click", () => {
+    if (stations.length === 0) return;
+    startBtn.disabled = true;
+    stopBtn.disabled = false;
+    intervalId = setInterval(() => {
+      const random = stations[Math.floor(Math.random() * stations.length)];
+      currentStation = random;
+      display.textContent = `${random.line} - ${random.station}`;
+    }, 100);
+  });
+
+  // Stopボタン
+  stopBtn.addEventListener("click", () => {
+    clearInterval(intervalId);
+    startBtn.disabled = false;
+    stopBtn.disabled = true;
+    if (currentStation) {
+      const stationText = `${currentStation.line} - ${currentStation.station}`;
+      const li = document.createElement("li");
+      li.textContent = stationText;
+      historyList.appendChild(li);
+      history.push(stationText);
+      if(history.length > 5){ // 最大5件に制限
+        history.shift(); // 古い履歴を削除
+        historyList.removeChild(historyList.firstChild);
+      }
+    }
+  });
+
+  // 履歴クリア
+  clearText.addEventListener("click", () => {
+    historyList.innerHTML = "";
+    history = [];
+  });
+
+  // プロンプト生成
   const generatePromptBtn = document.getElementById("generatePrompt");
   const promptOutput = document.getElementById("promptOutput");
   const promptText = document.getElementById("promptText");
@@ -174,66 +272,8 @@
     document.execCommand("copy");
     alert("プロンプトをコピーしました！");
   });
+
 </script>
-
-  
-  <div class="buttons">
-    <button class="start" id="startBtn">Start</button>
-    <button class="stop" id="stopBtn" disabled>Stop</button>
-  </div>
-
-  <script>
-    let stations = [];
-    let intervalId = null;
-    let currentStation = null;
-    let history = []; // ← 履歴を配列で保持するよう追加
-
-    // JSONを読み込む
-    fetch("tokyo_metro_stations.json")
-      .then(response => response.json())
-      .then(data => {
-        stations = data;
-        console.log("駅データ読み込み完了:", stations.length, "件");
-      })
-      .catch(err => console.error("JSON読み込みエラー:", err));
-
-    const display = document.getElementById("result");
-    const historyList = document.getElementById("historyList");
-    const startBtn = document.getElementById("startBtn");
-    const stopBtn = document.getElementById("stopBtn");
-    const clearText = document.getElementById("clearText");
-
-    startBtn.addEventListener("click", () => {
-      if (stations.length === 0) return;
-      startBtn.disabled = true;
-      stopBtn.disabled = false;
-      intervalId = setInterval(() => {
-        const random = stations[Math.floor(Math.random() * stations.length)];
-        currentStation = random;
-        display.textContent = `${random.line} - ${random.station}`;
-      }, 100);
-    });
-
-    stopBtn.addEventListener("click", () => {
-      clearInterval(intervalId);
-      startBtn.disabled = false;
-      stopBtn.disabled = true;
-      if (currentStation) {
-        const li = document.createElement("li");
-        li.textContent = `${currentStation.line} - ${currentStation.station}`;
-        historyList.appendChild(li);
-        
-        // 配列にも保存
-        history.push(stationText);
-      }
-    });
-
-    // 履歴クリア
-    clearText.addEventListener("click", () => {
-      historyList.innerHTML = "";
-      history = []; // 配列もリセット
-    });
-  </script>
 
 </body>
 </html>
