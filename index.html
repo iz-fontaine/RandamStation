@@ -147,9 +147,14 @@
 </div>
 
 <!-- ボタン群 -->
-<div class="button-group">
+<!-- <div class="button-group">
   <button class="start" id="startBtn">Start</button>
   <button class="stop" id="stopBtn" disabled>Stop</button>
+</div> -->
+
+  <!-- スタート・ストップ共通ボタン -->
+<div class="button-group">
+  <button class="toggle" id="toggleBtn">Start</button>
 </div>
   
 <!-- プロンプト作成ボタン -->
@@ -190,41 +195,72 @@
   const copyPromptBtn = document.getElementById("copyPrompt");
   const promptText = document.getElementById("promptText");
 
-  // Startボタン
-  startBtn.addEventListener("click", () => {
+  // // Startボタン
+  // startBtn.addEventListener("click", () => {
+  //   if (stations.length === 0) return;
+  //   startBtn.disabled = true;
+  //   stopBtn.disabled = false;
+  //   intervalId = setInterval(() => {
+  //     const random = stations[Math.floor(Math.random() * stations.length)];
+  //     currentStation = random;
+  //     display.textContent = `${random.line} - ${random.station}`;
+  //   }, 100);
+  // });
+
+  // // Stopボタン
+  // stopBtn.addEventListener("click", () => {
+  //   clearInterval(intervalId);
+  //   startBtn.disabled = false;
+  //   stopBtn.disabled = true;
+  //   if (currentStation) {
+  //     const stationText = `${currentStation.line} - ${currentStation.station}`;
+  //     const li = document.createElement("li");
+  //     li.textContent = stationText;
+  //     historyList.appendChild(li);
+  //     history.push(stationText);
+  //     if(history.length > 5){
+  //       history.shift();
+  //       historyList.removeChild(historyList.firstChild);
+  //     }
+  //   }
+  // });
+
+const toggleBtn = document.getElementById("toggleBtn");
+let isRunning = false;
+
+toggleBtn.addEventListener("click", () => {
+  if (!isRunning) {
+    // スタート処理
     if (stations.length === 0) return;
-    startBtn.disabled = true;
-    stopBtn.disabled = false;
     intervalId = setInterval(() => {
       const random = stations[Math.floor(Math.random() * stations.length)];
       currentStation = random;
       display.textContent = `${random.line} - ${random.station}`;
     }, 100);
-  });
-
-  // Stopボタン
-  stopBtn.addEventListener("click", () => {
+    toggleBtn.textContent = "Stop";
+    toggleBtn.classList.remove("start");
+    toggleBtn.classList.add("stop");
+    isRunning = true;
+  } else {
+    // ストップ処理
     clearInterval(intervalId);
-    startBtn.disabled = false;
-    stopBtn.disabled = true;
     if (currentStation) {
-      const stationText = `${currentStation.line} - ${currentStation.station}`;
       const li = document.createElement("li");
-      li.textContent = stationText;
+      li.textContent = `${currentStation.line} - ${currentStation.station}`;
       historyList.appendChild(li);
-      history.push(stationText);
-      if(history.length > 5){
-        history.shift();
-        historyList.removeChild(historyList.firstChild);
-      }
     }
-  });
-
+    toggleBtn.textContent = "Start";
+    toggleBtn.classList.remove("stop");
+    toggleBtn.classList.add("start");
+    isRunning = false;
+  }
+});
+  
   // 履歴クリア
   clearText.addEventListener("click", () => {
     historyList.innerHTML = "";
     history = [];
-    promptText.style.display = "none";
+    //promptText.style.display = "none";
   });
 
   // プロンプト生成
@@ -238,7 +274,7 @@
 
 【内容】
 
-・指定された駅をすべて巡るのに、最もスムーズな乗り換えルートを作成してください。
+・丸の内線荻窪駅をスタートとし、指定された駅をすべて巡るのに、最もスムーズな乗り換えルートを作成してください。
 　→「オススメルート」欄に、日本語 → フランス語の順で記載してください。（時系列・各駅間の所要時間・順番がわかるようにしてください）。
 ・各駅ごとに、駅周辺の観光名所を3か所紹介してください。
 　→それぞれの名所に、簡潔な説明をつけてください。
@@ -251,8 +287,8 @@
 【回答フォーマット】
 
 オススメルート：
-〜〜線●●駅 → 〜〜線●●駅 → 〜〜線●●駅 ・・・
-~~~-sen - ~~~~　→ ~~~-sen - ~~~~　→ ・・・
+〜〜線●●駅 →　（約~分） 〜〜線●●駅 → （約~分） 〜〜線●●駅 ・・・
+~~~-sen - ~~~~　→ （~ min.）~~~-sen - ~~~~　→ （~ min.）・・・
 
 【回答フォーマット】：
 〜〜線●●駅 / ~~~-sen - ~~~~
