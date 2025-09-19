@@ -15,10 +15,48 @@
       min-height: 100vh;
     }
 
+    
+
     h1 {
       text-align: center;
       margin: 20px 0;
       font-size: 1.5rem;
+    }
+
+    /* タイトル帯 */
+    .title {
+      background-color: #87cefa;   /* 水色 */
+      color: #fff;                 /* 文字は白 */
+      text-align: center;
+      padding: 15px 0;
+      margin: 0;
+      font-size: 24px;
+      font-weight: bold;
+    }
+    
+    /* 吹き出し */
+    .speech-bubble {
+      position: relative;
+      background: #f0f0f0;
+      border-radius: .4em;
+      padding: 15px 20px;
+      margin: 20px auto;
+      width: fit-content;
+      font-size: 18px;
+      font-weight: bold;
+      text-align: center;
+    }
+    
+    /* 吹き出しの三角部分（下向き） */
+    .speech-bubble:after {
+      content: '';
+      position: absolute;
+      bottom: -20px;   /* 下側に出す */
+      left: 50%;
+      transform: translateX(-50%);
+      border-width: 20px 20px 0;
+      border-style: solid;
+      border-color: #f0f0f0 transparent transparent transparent;
     }
 
     #result {
@@ -139,8 +177,14 @@
 </head>
 <body>
 
-<h1>東京メトロ駅ルーレット</h1>
-<div id="result">どこに行こー？</div>
+<!-- タイトル部分 -->
+<h1 class="title">東京メトロ駅ルーレット</h1>
+
+<!-- 吹き出し -->
+<div class="speech-bubble" id="result">どこに行こー？</div>
+  
+<!-- <h1>東京メトロ駅ルーレット</h1>
+<div id="result">どこに行こー？</div> -->
 
 <div id="history">
   <div id="history-header">
@@ -150,8 +194,8 @@
   <ul id="historyList"></ul>
 </div>
 
-ボタン群 -->
-<!-- <div class="button-group">
+<!-- ボタン群 -->
+<div class="button-group">
   <button class="start" id="startBtn">Start</button>
   <button class="stop" id="stopBtn" disabled>Stop</button>
 </div>
