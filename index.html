@@ -107,19 +107,6 @@
 
     .start { background: #007bff; }
     .stop { background: #dc3545; }
-    
-    #startStopBtn {
-      background-color: #007bff; /* 初期から青 */
-      color: #fff;
-      border: none;
-      padding: 10px 20px;
-      border-radius: 6px;
-      cursor: pointer;
-      font-size: 16px;
-    }
-    #startStopBtn:hover {
-      background-color: #0056b3;
-}
 
     
     #generatePrompt { background: #28a745; }
@@ -163,16 +150,16 @@
   <ul id="historyList"></ul>
 </div>
 
-<!-- ボタン群 -->
+ボタン群 -->
 <!-- <div class="button-group">
   <button class="start" id="startBtn">Start</button>
   <button class="stop" id="stopBtn" disabled>Stop</button>
-</div> -->
+</div>
 
-  <!-- スタート・ストップ共通ボタン -->
+<!--   <!-- スタート・ストップ共通ボタン -->
 <div class="button-group">
   <button class="toggle" id="toggleBtn">Start</button>
-</div>
+</div> -->
   
 <!-- プロンプト作成ボタン -->
 <div class="button-group" style="margin-top:5px;">
@@ -212,66 +199,66 @@
   const copyPromptBtn = document.getElementById("copyPrompt");
   const promptText = document.getElementById("promptText");
 
-  // // Startボタン
-  // startBtn.addEventListener("click", () => {
-  //   if (stations.length === 0) return;
-  //   startBtn.disabled = true;
-  //   stopBtn.disabled = false;
-  //   intervalId = setInterval(() => {
-  //     const random = stations[Math.floor(Math.random() * stations.length)];
-  //     currentStation = random;
-  //     display.textContent = `${random.line} - ${random.station}`;
-  //   }, 100);
-  // });
-
-  // // Stopボタン
-  // stopBtn.addEventListener("click", () => {
-  //   clearInterval(intervalId);
-  //   startBtn.disabled = false;
-  //   stopBtn.disabled = true;
-  //   if (currentStation) {
-  //     const stationText = `${currentStation.line} - ${currentStation.station}`;
-  //     const li = document.createElement("li");
-  //     li.textContent = stationText;
-  //     historyList.appendChild(li);
-  //     history.push(stationText);
-  //     if(history.length > 5){
-  //       history.shift();
-  //       historyList.removeChild(historyList.firstChild);
-  //     }
-  //   }
-  // });
-
-const toggleBtn = document.getElementById("toggleBtn");
-let isRunning = false;
-
-toggleBtn.addEventListener("click", () => {
-  if (!isRunning) {
-    // スタート処理
+  // Startボタン
+  startBtn.addEventListener("click", () => {
     if (stations.length === 0) return;
+    startBtn.disabled = true;
+    stopBtn.disabled = false;
     intervalId = setInterval(() => {
       const random = stations[Math.floor(Math.random() * stations.length)];
       currentStation = random;
       display.textContent = `${random.line} - ${random.station}`;
     }, 100);
-    toggleBtn.textContent = "Stop";
-    toggleBtn.classList.remove("start");
-    toggleBtn.classList.add("stop");
-    isRunning = true;
-  } else {
-    // ストップ処理
+  });
+
+  // Stopボタン
+  stopBtn.addEventListener("click", () => {
     clearInterval(intervalId);
+    startBtn.disabled = false;
+    stopBtn.disabled = true;
     if (currentStation) {
+      const stationText = `${currentStation.line} - ${currentStation.station}`;
       const li = document.createElement("li");
-      li.textContent = `${currentStation.line} - ${currentStation.station}`;
+      li.textContent = stationText;
       historyList.appendChild(li);
+      history.push(stationText);
+      if(history.length > 5){
+        history.shift();
+        historyList.removeChild(historyList.firstChild);
+      }
     }
-    toggleBtn.textContent = "Start";
-    toggleBtn.classList.remove("stop");
-    toggleBtn.classList.add("start");
-    isRunning = false;
-  }
-});
+  });
+
+// const toggleBtn = document.getElementById("toggleBtn");
+// let isRunning = false;
+
+// toggleBtn.addEventListener("click", () => {
+//   if (!isRunning) {
+//     // スタート処理
+//     if (stations.length === 0) return;
+//     intervalId = setInterval(() => {
+//       const random = stations[Math.floor(Math.random() * stations.length)];
+//       currentStation = random;
+//       display.textContent = `${random.line} - ${random.station}`;
+//     }, 100);
+//     toggleBtn.textContent = "Stop";
+//     toggleBtn.classList.remove("start");
+//     toggleBtn.classList.add("stop");
+//     isRunning = true;
+//   } else {
+//     // ストップ処理
+//     clearInterval(intervalId);
+//     if (currentStation) {
+//       const li = document.createElement("li");
+//       li.textContent = `${currentStation.line} - ${currentStation.station}`;
+//       historyList.appendChild(li);
+//     }
+//     toggleBtn.textContent = "Start";
+//     toggleBtn.classList.remove("stop");
+//     toggleBtn.classList.add("start");
+//     isRunning = false;
+//   }
+// });
   
   // 履歴クリア
   clearText.addEventListener("click", () => {
