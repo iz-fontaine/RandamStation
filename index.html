@@ -107,9 +107,25 @@
 
     .start { background: #007bff; }
     .stop { background: #dc3545; }
-    .toggle { background: #007bff; } /* 初期のボタンの色の設定のため */
+    
+    #startStopBtn {
+      background-color: #007bff; /* 初期から青 */
+      color: #fff;
+      border: none;
+      padding: 10px 20px;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 16px;
+    }
+    #startStopBtn:hover {
+      background-color: #0056b3;
+}
+
+    
     #generatePrompt { background: #28a745; }
     #copyPrompt { background: #ff9800; color: #000; }
+
+    
 
     /* プロンプトテキスト */
 #promptText {
